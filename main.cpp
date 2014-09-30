@@ -10,56 +10,50 @@
 #include "Charac.hpp"
 #include "Laser.hpp"
 #include "DrawingManager.hpp"
+#include "Ressources.hpp"
 
 using namespace std;
 
 int main(){
+
+    int delayLaserMoves(5); //in mili seconds
+    int pushNumber(1); //Inital
+
+    bool isGame(1); //Two bool for 3 states
+    bool hasStart(false);//look up
+    int spentTime(0); // For the final string , simple init;
+
+    int hit(0); //Not being hit twice is a nice thing;
+
     sf::RenderWindow window(sf::VideoMode(500,300),"Leyser");
 
     sf::Font captureIt;
-    if(!captureIt.loadFromFile("Capture it.ttf")){//No Game Over
-
-    }
-    sf::Text gameOver;
-    gameOver.setFont(captureIt);
-    gameOver.setString("Game Over");
-    gameOver.setCharacterSize(85);
-    gameOver.setColor(sf::Color::White);
-    gameOver.move(sf::Vector2f(15,85));
-
-    sf::Text timeSpentText;
-    timeSpentText.setFont(captureIt);
-    timeSpentText.setCharacterSize(25);
-    timeSpentText.setColor(sf::Color::Red);
-    timeSpentText.move(sf::Vector2f(150,200));
+    if(!captureIt.loadFromFile("Capture it.ttf")){}
 
     sf::Font hacked;
-    if(!hacked.loadFromFile("HACKED.ttf")){//No start screen
-
-    }
-    sf::Text startText;
-    startText.setFont(hacked);
-    startText.setString("Press S to Start");
-    startText.setCharacterSize(70);
-    startText.setColor(sf::Color::White);
-    startText.move(sf::Vector2f(15,85));
+    if(!hacked.loadFromFile("HACKED.ttf")){}
 
     sf::Texture backgroundTexture;
-    if(!backgroundTexture.loadFromFile("background.png")){ //Handle FATAL error;
+    if(!backgroundTexture.loadFromFile("background.png")){}
 
-    }
     sf::Texture laserTexture;
-    if(!laserTexture.loadFromFile("laser.png")){//Still a fatal error
+    if(!laserTexture.loadFromFile("laser.png")){}
 
-    }
     sf::Texture characTexture;
-    if(!characTexture.loadFromFile("char.png")){//And fatal again
+    if(!characTexture.loadFromFile("char.png")){}
 
-    }
     sf::Texture shieldTexture;
-    if(!shieldTexture.loadFromFile("shield.png")){//You could play , maybe.
+    if(!shieldTexture.loadFromFile("shield.png")){}
 
-    }
+
+
+    sf::Text gameOver = genGameOver(captureIt);
+
+    sf::Text timeSpentText = genSpentTime(captureIt);
+
+    sf::Text restartText = genRestart(captureIt);
+
+    sf::Text startText = genStart(hacked);
 
     sf::Sprite backgroundSprite;
     backgroundSprite.setTexture(backgroundTexture);
@@ -73,14 +67,6 @@ int main(){
     sf::Clock gameClock;
 
     sf::Clock laserClock;
-    int delayLaserMoves(5); //in mili seconds
-    int pushNumber(1);
-
-    bool isGame(1);
-    bool hasStart(false);
-    int spentTime(0);
-
-    int hit(0);
 
     Charac player;
 
@@ -96,26 +82,34 @@ int main(){
 
         if(window.pollEvent(event)){
              if(event.type == sf::Event::Closed){
-
                 window.close();
             }
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)){
                 window.close();
             }
             if(event.type == sf::Event::KeyPressed){
-                if(event.key.code == sf::Keyboard::Up){
+                if(event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Z){
                     player.moveLane(UP);
                 }
-                if(event.key.code == sf::Keyboard::Down){
+                if(event.key.code == sf::Keyboard::Down || event.key.code == sf::Keyboard::S){
                     player.moveLane(DOWN);
                 }
                 if(event.key.code == sf::Keyboard::G){
                     isGame = false;
                 }
-                if(event.key.code == sf::Keyboard::S && !hasStart){
+                if(event.key.code == sf::Keyboard::X && !hasStart){
                     hasStart = true;
                     gameClock.restart();
                     pushNumber = 1;
+                }
+                if(event.key.code == sf::Keyboard::R && !isGame){
+                    isGame = true; // Re-Init evrything
+                    pushNumber = 1;
+                    gameClock.restart();
+                    laserClock.restart();
+                    spentTime = 0;
+                    player.setShield();
+                    delete laser;
                 }
             }
         }
@@ -168,15 +162,10 @@ int main(){
         window.clear(sf::Color::Black);
 
         if(isGame && hasStart){
-        window.draw(backgroundSprite);
-
-        drawChar(window,charSprite,shieldSprite,player);
-        drawLaser(window,laserSprite,laser);
+            drawGame(window,charSprite,shieldSprite,player,laserSprite,laser,backgroundSprite);
         }
         if(!isGame){
-            window.draw(gameOver);
-            timeSpentText.setString("Time spent : " + std::to_string(spentTime));
-            window.draw(timeSpentText);
+            drawGameOverScreen(window,gameOver,timeSpentText,restartText,spentTime);
         }
         if(!hasStart){
             window.draw(startText);
