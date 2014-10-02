@@ -6,6 +6,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
+#include <SFML/Audio.hpp>
+
 
 #include "Charac.hpp"
 #include "Laser.hpp"
@@ -15,6 +17,12 @@
 using namespace std;
 
 int main(){
+
+    sf::Music music;
+    if(!music.openFromFile("dramaticEnding.ogg")){}
+    music.play();
+    music.setLoop(true);
+    music.setVolume(30);
 
     int delayLaserMoves(5); //in mili seconds
     int pushNumber(1); //Inital

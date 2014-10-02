@@ -4,6 +4,7 @@ Leyser
 A small game made in two hours
 
 I am not the owner of the "Capture It" and "Hacked" Fonts , license and owners in the files.
+Neither of Dramatic Ending.
 
 All images are made by me for this time.
 
